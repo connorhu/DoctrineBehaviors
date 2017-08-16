@@ -215,6 +215,7 @@ class TranslatableSubscriber extends AbstractSubscriber
     private function mapTranslation(ClassMetadata $classMetadata)
     {
         if (!$classMetadata->hasAssociation('translatable')) {
+            $idFieldName = $classMetadata->getReflectionClass()->hasMethod('getTranslatableEntityId') ? $classMetadata->getReflectionClass()->getMethod('getTranslatableEntityId')->invoke(null) : 'id';
             $classMetadata->mapManyToOne([
                 'fieldName'    => 'translatable',
                 'inversedBy'   => 'translations',
@@ -222,7 +223,7 @@ class TranslatableSubscriber extends AbstractSubscriber
                 'fetch'        => $this->translationFetchMode,
                 'joinColumns'  => [[
                     'name'                 => 'translatable_id',
-                    'referencedColumnName' => 'id',
+                    'referencedColumnName' => $idFieldName,
                     'onDelete'             => 'CASCADE'
                 ]],
                 'targetEntity' => $classMetadata->getReflectionClass()->getMethod('getTranslatableEntityClass')->invoke(null),
