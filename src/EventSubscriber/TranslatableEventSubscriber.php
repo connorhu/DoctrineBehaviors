@@ -129,6 +129,8 @@ final class TranslatableEventSubscriber implements EventSubscriber
     private function mapTranslation(ClassMetadataInfo $classMetadataInfo): void
     {
         if (! $classMetadataInfo->hasAssociation('translatable')) {
+            $idFieldName = $classMetadata->getReflectionClass()->hasMethod('getTranslatableEntityId') ? $classMetadata->getReflectionClass()->getMethod('getTranslatableEntityId')->invoke(null) : 'id';
+            
             $classMetadataInfo->mapManyToOne([
                 'fieldName' => 'translatable',
                 'inversedBy' => 'translations',
@@ -136,7 +138,7 @@ final class TranslatableEventSubscriber implements EventSubscriber
                 'fetch' => $this->translationFetchMode,
                 'joinColumns' => [[
                     'name' => 'translatable_id',
-                    'referencedColumnName' => 'id',
+                    'referencedColumnName' => $idFieldName,
                     'onDelete' => 'CASCADE',
                 ]],
                 'targetEntity' => $classMetadataInfo->getReflectionClass()
