@@ -129,7 +129,7 @@ final class TranslatableEventSubscriber implements EventSubscriber
     private function mapTranslation(ClassMetadataInfo $classMetadataInfo): void
     {
         if (! $classMetadataInfo->hasAssociation('translatable')) {
-            $idFieldName = $classMetadata->getReflectionClass()->hasMethod('getTranslatableEntityId') ? $classMetadata->getReflectionClass()->getMethod('getTranslatableEntityId')->invoke(null) : 'id';
+            $idFieldName = $classMetadataInfo->getReflectionClass()->hasMethod('getTranslatableEntityId') ? $classMetadataInfo->getReflectionClass()->getMethod('getTranslatableEntityId')->invoke(null) : 'id';
             
             $classMetadataInfo->mapManyToOne([
                 'fieldName' => 'translatable',
