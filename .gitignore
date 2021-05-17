@@ -1,4 +1,6 @@
-composer.phar
-vendor
+/vendor
 composer.lock
-bin
+.idea
+.phpunit.result.cache
+
+config/secrets/*
