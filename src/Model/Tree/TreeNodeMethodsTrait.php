@@ -190,7 +190,8 @@ trait TreeNodeMethodsTrait
         $tree = $this->toArray($prepare);
 
         $json = json_encode($tree);
-        if ($error = json_last_error()) {
+        if ($json === false) {
+            $error = json_last_error();
             throw new JsonException(json_last_error_msg(), $error);
         }
 
