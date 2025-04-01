@@ -397,15 +397,15 @@ final class TranslatableTest extends AbstractBehaviorTestCase
 
     public function testCustomColumnName(): void
     {
-        $translatableEntityWithCustom = new TranslatableEntityWithCustomColumnName();
-        $translatableEntityWithCustom->translate('en')
+        $translatableEntityWithCustomColumnName = new TranslatableEntityWithCustomColumnName();
+        $translatableEntityWithCustomColumnName->translate('en')
             ->setTitle('awesome');
-        $translatableEntityWithCustom->mergeNewTranslations();
+        $translatableEntityWithCustomColumnName->mergeNewTranslations();
 
-        $this->entityManager->persist($translatableEntityWithCustom);
+        $this->entityManager->persist($translatableEntityWithCustomColumnName);
         $this->entityManager->flush();
 
-        $id = $translatableEntityWithCustom->getId();
+        $id = $translatableEntityWithCustomColumnName->getId();
         $this->entityManager->clear();
 
         /** @var TranslatableEntityWithCustomColumnName $translatableEntity */
