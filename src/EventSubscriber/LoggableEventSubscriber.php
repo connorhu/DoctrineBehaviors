@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Knp\DoctrineBehaviors\EventSubscriber;
 
 use Doctrine\Bundle\DoctrineBundle\Attribute\AsDoctrineListener;
+use Doctrine\Common\EventSubscriber;
 use Doctrine\ORM\Event\LifecycleEventArgs;
 use Doctrine\ORM\Event\PostPersistEventArgs;
 use Doctrine\ORM\Event\PostUpdateEventArgs;
@@ -17,7 +18,7 @@ use Psr\Log\LogLevel;
 #[AsDoctrineListener(event: Events::postPersist)]
 #[AsDoctrineListener(event: Events::postUpdate)]
 #[AsDoctrineListener(event: Events::preRemove)]
-final class LoggableEventSubscriber
+final class LoggableEventSubscriber implements EventSubscriber
 {
     public function __construct(
         private LoggerInterface $logger
@@ -79,5 +80,14 @@ final class LoggableEventSubscriber
         }
 
         $this->logger->log(LogLevel::INFO, $message);
+    }
+
+    public function getSubscribedEvents()
+    {
+        $class = new \ReflectionClass(__CLASS__);
+        $attributes = $class->getAttributes(AsDoctrineListener::class);
+        return array_map(function (\ReflectionAttribute $attribute) {
+            return $attribute->getArguments()['event'];
+        }, $attributes);
     }
 }

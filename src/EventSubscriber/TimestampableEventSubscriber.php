@@ -5,13 +5,16 @@ declare(strict_types=1);
 namespace Knp\DoctrineBehaviors\EventSubscriber;
 
 use Doctrine\Bundle\DoctrineBundle\Attribute\AsDoctrineListener;
+use Doctrine\Common\EventSubscriber;
 use Doctrine\ORM\Event\LoadClassMetadataEventArgs;
 use Doctrine\ORM\Events;
 use Knp\DoctrineBehaviors\Contract\Entity\TimestampableInterface;
 
 #[AsDoctrineListener(event: Events::loadClassMetadata)]
-final class TimestampableEventSubscriber
+final class TimestampableEventSubscriber implements EventSubscriber
 {
+    use SubscribedEventsWithAttributeTrait;
+
     public function __construct(
         private string $timestampableDateFieldType
     ) {

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Knp\DoctrineBehaviors\EventSubscriber;
 
 use Doctrine\Bundle\DoctrineBundle\Attribute\AsDoctrineListener;
+use Doctrine\Common\EventSubscriber;
 use Doctrine\ORM\Event\LoadClassMetadataEventArgs;
 use Doctrine\ORM\Event\PostLoadEventArgs;
 use Doctrine\ORM\Event\PrePersistEventArgs;
@@ -19,8 +20,10 @@ use ReflectionClass;
 #[AsDoctrineListener(event: Events::loadClassMetadata)]
 #[AsDoctrineListener(event: Events::postLoad)]
 #[AsDoctrineListener(event: Events::prePersist)]
-final class TranslatableEventSubscriber
+final class TranslatableEventSubscriber implements EventSubscriber
 {
+    use SubscribedEventsWithAttributeTrait;
+
     /**
      * @var string
      */

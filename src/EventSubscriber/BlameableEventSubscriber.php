@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Knp\DoctrineBehaviors\EventSubscriber;
 
 use Doctrine\Bundle\DoctrineBundle\Attribute\AsDoctrineListener;
+use Doctrine\Common\EventSubscriber;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Event\LoadClassMetadataEventArgs;
 use Doctrine\ORM\Event\PrePersistEventArgs;
@@ -15,12 +16,13 @@ use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Doctrine\ORM\UnitOfWork;
 use Knp\DoctrineBehaviors\Contract\Entity\BlameableInterface;
 use Knp\DoctrineBehaviors\Contract\Provider\UserProviderInterface;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 #[AsDoctrineListener(event: Events::prePersist)]
 #[AsDoctrineListener(event: Events::preUpdate)]
 #[AsDoctrineListener(event: Events::preRemove)]
 #[AsDoctrineListener(event: Events::loadClassMetadata)]
-final class BlameableEventSubscriber
+final class BlameableEventSubscriber implements EventSubscriber
 {
     /**
      * @var string
@@ -193,5 +195,14 @@ final class BlameableEventSubscriber
             'type' => 'string',
             'nullable' => true,
         ]);
+    }
+
+    public function getSubscribedEvents()
+    {
+        $class = new \ReflectionClass(__CLASS__);
+        $attributes = $class->getAttributes(AsDoctrineListener::class);
+        return array_map(function (\ReflectionAttribute $attribute) {
+            return $attribute->getArguments()['event'];
+        }, $attributes);
     }
 }
