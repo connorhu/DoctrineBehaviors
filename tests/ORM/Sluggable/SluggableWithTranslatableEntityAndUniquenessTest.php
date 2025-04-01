@@ -42,13 +42,13 @@ final class SluggableWithTranslatableEntityAndUniquenessTest extends AbstractBeh
         /** @var SluggableTranslatableEntity $entity */
         $entity = $this->translatableRepository->find($id);
         $sluggableTranslatableEntityTranslation = $entity->translate('fr');
-        $entityEN = $entity->translate('en');
+        $translation = $entity->translate('en');
 
         $this->assertNotNull($entity);
         $this->assertSame('Lorem ipsum', $sluggableTranslatableEntityTranslation->getTitle());
         $this->assertSame('lorem-ipsum', $sluggableTranslatableEntityTranslation->getSlug());
-        $this->assertSame('Lorem ipsum', $entityEN->getTitle());
-        $this->assertSame('lorem-ipsum-1', $entityEN->getSlug());
+        $this->assertSame('Lorem ipsum', $translation->getTitle());
+        $this->assertSame('lorem-ipsum-1', $translation->getSlug());
     }
 
     public function testNotUpdatedSlug(): void
@@ -64,16 +64,16 @@ final class SluggableWithTranslatableEntityAndUniquenessTest extends AbstractBeh
         $this->entityManager->flush();
 
         $sluggableTranslatableEntityTranslation = $sluggableTranslatableEntity->translate('fr');
-        $entityEN = $sluggableTranslatableEntity->translate('en');
+        $translation = $sluggableTranslatableEntity->translate('en');
 
         $this->assertSame('lorem-ipsum', $sluggableTranslatableEntityTranslation->getSlug());
-        $this->assertSame('lorem-ipsum-1', $entityEN->getSlug());
+        $this->assertSame('lorem-ipsum-1', $translation->getSlug());
         $sluggableTranslatableEntity->translate('fr')
             ->setTitle('Mon titre');
         $sluggableTranslatableEntity->translate('en')
             ->setTitle('My title');
 
         $this->assertSame('lorem-ipsum', $sluggableTranslatableEntityTranslation->getSlug());
-        $this->assertSame('lorem-ipsum-1', $entityEN->getSlug());
+        $this->assertSame('lorem-ipsum-1', $translation->getSlug());
     }
 }
