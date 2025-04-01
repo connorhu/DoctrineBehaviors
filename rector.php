@@ -6,7 +6,6 @@ use Rector\Config\RectorConfig;
 use Rector\Doctrine\Set\DoctrineSetList;
 use Rector\Naming\Rector\Class_\RenamePropertyToMatchTypeRector;
 use Rector\Nette\Set\NetteSetList;
-use Rector\Php80\Rector\FunctionLike\UnionTypesRector;
 use Rector\Set\ValueObject\LevelSetList;
 use Rector\Set\ValueObject\SetList;
 
