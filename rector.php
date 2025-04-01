@@ -17,12 +17,6 @@ return static function (RectorConfig $rectorConfig): void {
 
     $rectorConfig->skip([
         RenamePropertyToMatchTypeRector::class => [__DIR__ . '/tests/ORM/'],
-
-        UnionTypesRector::class => [
-            // to keep BC return types
-            __DIR__ . '/src/Contract/Entity',
-            'src/Model/*/*Trait.php',
-        ],
     ]);
 
     // doctrine annotations to attributes
@@ -31,7 +25,7 @@ return static function (RectorConfig $rectorConfig): void {
         SetList::DEAD_CODE,
         SetList::CODE_QUALITY,
         SetList::CODING_STYLE,
-        NetteSetList::NETTE_CODE_QUALITY,
+        // NetteSetList::NETTE_CODE_QUALITY,
         SetList::NAMING,
         LevelSetList::UP_TO_PHP_80,
     ]);
