@@ -10,6 +10,7 @@ use Knp\DoctrineBehaviors\Contract\Entity\TranslatableInterface;
 use Knp\DoctrineBehaviors\Contract\Entity\TranslationInterface;
 use Knp\DoctrineBehaviors\Tests\AbstractBehaviorTestCase;
 use Knp\DoctrineBehaviors\Tests\Fixtures\Contract\Translatable\TranslatableEntityWithCustomInterface;
+use Knp\DoctrineBehaviors\Tests\Fixtures\Entity\Translatable\TranslatableEntityWithCustomColumnName;
 use Knp\DoctrineBehaviors\Tests\Fixtures\Entity\TranslatableCustomIdentifierEntity;
 use Knp\DoctrineBehaviors\Tests\Fixtures\Entity\TranslatableCustomizedEntity;
 use Knp\DoctrineBehaviors\Tests\Fixtures\Entity\TranslatableEntity;
@@ -413,5 +414,24 @@ final class TranslatableTest extends AbstractBehaviorTestCase
             ClassMetadataInfo::ONE_TO_MANY,
             $translatableClassMetadata->getAssociationMapping('translations')['type']
         );
+    }
+
+    public function testCustomColumnName(): void
+    {
+        $translatableEntityWithCustom = new TranslatableEntityWithCustomColumnName();
+        $translatableEntityWithCustom->translate('en')
+            ->setTitle('awesome');
+        $translatableEntityWithCustom->mergeNewTranslations();
+
+        $this->entityManager->persist($translatableEntityWithCustom);
+        $this->entityManager->flush();
+
+        $id = $translatableEntityWithCustom->getId();
+        $this->entityManager->clear();
+
+        /** @var TranslatableEntityWithCustomColumnName $translatableEntity */
+        $translatableEntity = $this->entityManager->getRepository(TranslatableEntityWithCustomColumnName::class)->find($id);
+
+        $this->assertSame('awesome', $translatableEntity->translate('en')->getTitle());
     }
 }
