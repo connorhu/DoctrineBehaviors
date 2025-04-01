@@ -395,6 +395,27 @@ final class TranslatableTest extends AbstractBehaviorTestCase
         $this->assertSame('awesome', $translatableEntityWithCustom->translate('en')->getTitle());
     }
 
+    public function testCustomColumnName(): void
+    {
+        $translatableEntityWithCustom = new TranslatableEntityWithCustomColumnName();
+        $translatableEntityWithCustom->translate('en')
+            ->setTitle('awesome');
+        $translatableEntityWithCustom->mergeNewTranslations();
+
+        $this->entityManager->persist($translatableEntityWithCustom);
+        $this->entityManager->flush();
+
+        $id = $translatableEntityWithCustom->getId();
+        $this->entityManager->clear();
+
+        /** @var TranslatableEntityWithCustomColumnName $translatableEntity */
+        $translatableEntity = $this->entityManager->getRepository(TranslatableEntityWithCustomColumnName::class)->find(
+            $id
+        );
+
+        $this->assertSame('awesome', $translatableEntity->translate('en')->getTitle());
+    }
+
     /**
      * @param class-string $translatableClass
      * @param class-string $translationClass
@@ -414,24 +435,5 @@ final class TranslatableTest extends AbstractBehaviorTestCase
             ClassMetadataInfo::ONE_TO_MANY,
             $translatableClassMetadata->getAssociationMapping('translations')['type']
         );
-    }
-
-    public function testCustomColumnName(): void
-    {
-        $translatableEntityWithCustom = new TranslatableEntityWithCustomColumnName();
-        $translatableEntityWithCustom->translate('en')
-            ->setTitle('awesome');
-        $translatableEntityWithCustom->mergeNewTranslations();
-
-        $this->entityManager->persist($translatableEntityWithCustom);
-        $this->entityManager->flush();
-
-        $id = $translatableEntityWithCustom->getId();
-        $this->entityManager->clear();
-
-        /** @var TranslatableEntityWithCustomColumnName $translatableEntity */
-        $translatableEntity = $this->entityManager->getRepository(TranslatableEntityWithCustomColumnName::class)->find($id);
-
-        $this->assertSame('awesome', $translatableEntity->translate('en')->getTitle());
     }
 }
