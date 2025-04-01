@@ -11,7 +11,7 @@ use Doctrine\ORM\Event\LoadClassMetadataEventArgs;
 use Doctrine\ORM\Event\PrePersistEventArgs;
 use Doctrine\ORM\Event\PreUpdateEventArgs;
 use Doctrine\ORM\Events;
-use Doctrine\ORM\Mapping\ClassMetadataInfo;
+use Doctrine\ORM\Mapping\ClassMetadata;
 use Knp\DoctrineBehaviors\Contract\Entity\SluggableInterface;
 use Knp\DoctrineBehaviors\Repository\DefaultSluggableRepository;
 
@@ -57,7 +57,7 @@ final class SluggableEventSubscriber implements EventSubscriber
         $this->processLifecycleEventArgs($eventArgs);
     }
 
-    private function shouldSkip(ClassMetadataInfo $classMetadataInfo): bool
+    private function shouldSkip(ClassMetadata $classMetadataInfo): bool
     {
         if (! is_a($classMetadataInfo->getName(), SluggableInterface::class, true)) {
             return true;
@@ -68,7 +68,7 @@ final class SluggableEventSubscriber implements EventSubscriber
 
     private function processLifecycleEventArgs(PrePersistEventArgs|PreUpdateEventArgs $lifecycleEventArgs): void
     {
-        $entity = $lifecycleEventArgs->getEntity();
+        $entity = $lifecycleEventArgs->getObject();
         if (! $entity instanceof SluggableInterface) {
             return;
         }
