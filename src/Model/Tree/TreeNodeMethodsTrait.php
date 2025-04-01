@@ -275,9 +275,6 @@ trait TreeNodeMethodsTrait
         unset($this->getChildNodes()[$offset]);
     }
 
-    /**
-     * @return mixed
-     */
     public function offsetGet(mixed $offset): mixed
     {
         return $this->getChildNodes()[$offset];
