@@ -4,17 +4,23 @@ declare(strict_types=1);
 
 namespace Knp\DoctrineBehaviors\EventSubscriber;
 
-use Doctrine\Bundle\DoctrineBundle\EventSubscriber\EventSubscriberInterface;
+use Doctrine\Bundle\DoctrineBundle\Attribute\AsDoctrineListener;
 use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\ORM\Event\LifecycleEventArgs;
 use Doctrine\ORM\Event\LoadClassMetadataEventArgs;
+use Doctrine\ORM\Event\PrePersistEventArgs;
+use Doctrine\ORM\Event\PreRemoveEventArgs;
+use Doctrine\ORM\Event\PreUpdateEventArgs;
 use Doctrine\ORM\Events;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Doctrine\ORM\UnitOfWork;
 use Knp\DoctrineBehaviors\Contract\Entity\BlameableInterface;
 use Knp\DoctrineBehaviors\Contract\Provider\UserProviderInterface;
 
-final class BlameableEventSubscriber implements EventSubscriberInterface
+#[AsDoctrineListener(event: Events::prePersist)]
+#[AsDoctrineListener(event: Events::preUpdate)]
+#[AsDoctrineListener(event: Events::preRemove)]
+#[AsDoctrineListener(event: Events::loadClassMetadata)]
+final class BlameableEventSubscriber
 {
     /**
      * @var string
@@ -59,9 +65,9 @@ final class BlameableEventSubscriber implements EventSubscriberInterface
     /**
      * Stores the current user into createdBy and updatedBy properties
      */
-    public function prePersist(LifecycleEventArgs $lifecycleEventArgs): void
+    public function prePersist(PrePersistEventArgs $eventArgs): void
     {
-        $entity = $lifecycleEventArgs->getEntity();
+        $entity = $eventArgs->getObject();
         if (! $entity instanceof BlameableInterface) {
             return;
         }
@@ -90,9 +96,9 @@ final class BlameableEventSubscriber implements EventSubscriberInterface
     /**
      * Stores the current user into updatedBy property
      */
-    public function preUpdate(LifecycleEventArgs $lifecycleEventArgs): void
+    public function preUpdate(PreUpdateEventArgs $eventArgs): void
     {
-        $entity = $lifecycleEventArgs->getEntity();
+        $entity = $eventArgs->getObject();
         if (! $entity instanceof BlameableInterface) {
             return;
         }
@@ -112,9 +118,9 @@ final class BlameableEventSubscriber implements EventSubscriberInterface
     /**
      * Stores the current user into deletedBy property
      */
-    public function preRemove(LifecycleEventArgs $lifecycleEventArgs): void
+    public function preRemove(PreRemoveEventArgs $eventArgs): void
     {
-        $entity = $lifecycleEventArgs->getEntity();
+        $entity = $eventArgs->getObject();
         if (! $entity instanceof BlameableInterface) {
             return;
         }
@@ -129,14 +135,6 @@ final class BlameableEventSubscriber implements EventSubscriberInterface
 
         $this->getUnitOfWork()
             ->propertyChanged($entity, self::DELETED_BY, $oldDeletedBy, $user);
-    }
-
-    /**
-     * @return string[]
-     */
-    public function getSubscribedEvents(): array
-    {
-        return [Events::prePersist, Events::preUpdate, Events::preRemove, Events::loadClassMetadata];
     }
 
     private function mapEntity(ClassMetadataInfo $classMetadataInfo): void
