@@ -8,9 +8,9 @@ use Closure;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Knp\DoctrineBehaviors\Contract\Entity\TreeNodeInterface;
+use Knp\DoctrineBehaviors\Exception\JsonException;
 use Knp\DoctrineBehaviors\Exception\ShouldNotHappenException;
 use Knp\DoctrineBehaviors\Exception\TreeException;
-use Nette\Utils\Json;
 
 trait TreeNodeMethodsTrait
 {
@@ -183,12 +183,18 @@ trait TreeNodeMethodsTrait
 
     /**
      * @param Closure $prepare a function to prepare the node before putting into the result
+     * @throws JsonException
      */
     public function toJson(?Closure $prepare = null): string
     {
         $tree = $this->toArray($prepare);
 
-        return Json::encode($tree);
+        $json = json_encode($tree);
+        if ($error = json_last_error()) {
+            throw new JsonException(json_last_error_msg(), $error);
+        }
+
+        return $json;
     }
 
     /**
