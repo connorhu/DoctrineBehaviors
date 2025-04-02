@@ -10,6 +10,7 @@ use Doctrine\ORM\Event\LifecycleEventArgs;
 use Doctrine\ORM\Event\LoadClassMetadataEventArgs;
 use Doctrine\ORM\Events;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
+use Doctrine\ORM\Mapping\MappingException;
 use Doctrine\ORM\UnitOfWork;
 use Knp\DoctrineBehaviors\Contract\Entity\BlameableInterface;
 use Knp\DoctrineBehaviors\Contract\Provider\UserProviderInterface;
@@ -53,6 +54,7 @@ final class BlameableEventSubscriber implements EventSubscriberInterface
             return;
         }
 
+        /** @var ClassMetadataInfo<BlameableInterface> $classMetadata */
         $this->mapEntity($classMetadata);
     }
 
@@ -139,6 +141,11 @@ final class BlameableEventSubscriber implements EventSubscriberInterface
         return [Events::prePersist, Events::preUpdate, Events::preRemove, Events::loadClassMetadata];
     }
 
+    /**
+     * @param ClassMetadataInfo<BlameableInterface> $classMetadataInfo
+     * @return void
+     * @throws MappingException
+     */
     private function mapEntity(ClassMetadataInfo $classMetadataInfo): void
     {
         if ($this->blameableUserEntity !== null && class_exists($this->blameableUserEntity)) {
@@ -153,6 +160,10 @@ final class BlameableEventSubscriber implements EventSubscriberInterface
         return $this->entityManager->getUnitOfWork();
     }
 
+    /**
+     * @param ClassMetadataInfo<BlameableInterface> $classMetadataInfo
+     * @return void
+     */
     private function mapManyToOneUser(ClassMetadataInfo $classMetadataInfo): void
     {
         $this->mapManyToOneWithTargetEntity($classMetadataInfo, self::CREATED_BY);
@@ -160,6 +171,11 @@ final class BlameableEventSubscriber implements EventSubscriberInterface
         $this->mapManyToOneWithTargetEntity($classMetadataInfo, self::DELETED_BY);
     }
 
+    /**
+     * @param ClassMetadataInfo<BlameableInterface> $classMetadataInfo
+     * @return void
+     * @throws MappingException
+     */
     private function mapStringUser(ClassMetadataInfo $classMetadataInfo): void
     {
         $this->mapStringNullableField($classMetadataInfo, self::CREATED_BY);
@@ -167,6 +183,11 @@ final class BlameableEventSubscriber implements EventSubscriberInterface
         $this->mapStringNullableField($classMetadataInfo, self::DELETED_BY);
     }
 
+    /**
+     * @param ClassMetadataInfo<BlameableInterface> $classMetadataInfo
+     * @param string $fieldName
+     * @return void
+     */
     private function mapManyToOneWithTargetEntity(ClassMetadataInfo $classMetadataInfo, string $fieldName): void
     {
         if ($classMetadataInfo->hasAssociation($fieldName)) {
@@ -184,6 +205,12 @@ final class BlameableEventSubscriber implements EventSubscriberInterface
         ]);
     }
 
+    /**
+     * @param ClassMetadataInfo<BlameableInterface> $classMetadataInfo
+     * @param string $fieldName
+     * @return void
+     * @throws MappingException
+     */
     private function mapStringNullableField(ClassMetadataInfo $classMetadataInfo, string $fieldName): void
     {
         if ($classMetadataInfo->hasField($fieldName)) {
