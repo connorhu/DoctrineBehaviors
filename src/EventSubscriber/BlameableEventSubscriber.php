@@ -23,6 +23,8 @@ use Knp\DoctrineBehaviors\Contract\Provider\UserProviderInterface;
 #[AsDoctrineListener(event: Events::loadClassMetadata)]
 final class BlameableEventSubscriber implements EventSubscriber
 {
+    use SubscribedEventsWithAttributeTrait;
+
     /**
      * @var string
      */
@@ -136,15 +138,6 @@ final class BlameableEventSubscriber implements EventSubscriber
 
         $this->getUnitOfWork()
             ->propertyChanged($entity, self::DELETED_BY, $oldDeletedBy, $user);
-    }
-
-    public function getSubscribedEvents()
-    {
-        $class = new \ReflectionClass(__CLASS__);
-        $attributes = $class->getAttributes(AsDoctrineListener::class);
-        return array_map(function (\ReflectionAttribute $attribute) {
-            return $attribute->getArguments()['event'];
-        }, $attributes);
     }
 
     private function mapEntity(ClassMetadata $classMetadataInfo): void

@@ -19,6 +19,8 @@ use Psr\Log\LogLevel;
 #[AsDoctrineListener(event: Events::preRemove)]
 final class LoggableEventSubscriber implements EventSubscriber
 {
+    use SubscribedEventsWithAttributeTrait;
+
     public function __construct(
         private LoggerInterface $logger
     ) {
@@ -54,15 +56,6 @@ final class LoggableEventSubscriber implements EventSubscriber
         if ($entity instanceof LoggableInterface) {
             $this->logger->log(LogLevel::INFO, $entity->getRemoveLogMessage());
         }
-    }
-
-    public function getSubscribedEvents()
-    {
-        $class = new \ReflectionClass(__CLASS__);
-        $attributes = $class->getAttributes(AsDoctrineListener::class);
-        return array_map(function (\ReflectionAttribute $attribute) {
-            return $attribute->getArguments()['event'];
-        }, $attributes);
     }
 
     /**
