@@ -84,7 +84,7 @@ trait TreeNodeMethodsTrait
     }
 
     /**
-     * @return Collection<TreeNodeInterface>
+     * @return Collection<int, TreeNodeInterface>
      */
     public function getChildNodes(): Collection
     {
@@ -182,7 +182,8 @@ trait TreeNodeMethodsTrait
     }
 
     /**
-     * @param Closure $prepare a function to prepare the node before putting into the result
+     * @param Closure|null $prepare a function to prepare the node before putting into the result
+     * @return string
      * @throws JsonException
      */
     public function toJson(?Closure $prepare = null): string
@@ -199,7 +200,9 @@ trait TreeNodeMethodsTrait
     }
 
     /**
-     * @param Closure $prepare a function to prepare the node before putting into the result
+     * @param Closure|null $prepare a function to prepare the node before putting into the result
+     * @param array|null $tree
+     * @return array
      */
     public function toArray(?Closure $prepare = null, ?array &$tree = null): array
     {
@@ -230,8 +233,9 @@ trait TreeNodeMethodsTrait
     }
 
     /**
-     * @param Closure $prepare a function to prepare the node before putting into the result
-     * @param array $tree a reference to an array, used internally for recursion
+     * @param Closure|null $prepare a function to prepare the node before putting into the result
+     * @param array|null $tree a reference to an array, used internally for recursion
+     * @return array
      */
     public function toFlatArray(?Closure $prepare = null, ?array &$tree = null): array
     {
