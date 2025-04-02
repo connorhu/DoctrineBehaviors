@@ -16,7 +16,6 @@ use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\UnitOfWork;
 use Knp\DoctrineBehaviors\Contract\Entity\BlameableInterface;
 use Knp\DoctrineBehaviors\Contract\Provider\UserProviderInterface;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 #[AsDoctrineListener(event: Events::prePersist)]
 #[AsDoctrineListener(event: Events::preUpdate)]
@@ -139,6 +138,15 @@ final class BlameableEventSubscriber implements EventSubscriber
             ->propertyChanged($entity, self::DELETED_BY, $oldDeletedBy, $user);
     }
 
+    public function getSubscribedEvents()
+    {
+        $class = new \ReflectionClass(__CLASS__);
+        $attributes = $class->getAttributes(AsDoctrineListener::class);
+        return array_map(function (\ReflectionAttribute $attribute) {
+            return $attribute->getArguments()['event'];
+        }, $attributes);
+    }
+
     private function mapEntity(ClassMetadata $classMetadataInfo): void
     {
         if ($this->blameableUserEntity !== null && class_exists($this->blameableUserEntity)) {
@@ -180,7 +188,9 @@ final class BlameableEventSubscriber implements EventSubscriber
             'targetEntity' => $this->blameableUserEntity,
             'joinColumns' => [
                 [
-                    'referencedColumnName' => $userMetadata->getColumnName($userMetadata->getSingleIdentifierFieldName()),
+                    'referencedColumnName' => $userMetadata->getColumnName(
+                        $userMetadata->getSingleIdentifierFieldName()
+                    ),
                     'onDelete' => 'SET NULL',
                 ],
             ],
@@ -198,14 +208,5 @@ final class BlameableEventSubscriber implements EventSubscriber
             'type' => 'string',
             'nullable' => true,
         ]);
-    }
-
-    public function getSubscribedEvents()
-    {
-        $class = new \ReflectionClass(__CLASS__);
-        $attributes = $class->getAttributes(AsDoctrineListener::class);
-        return array_map(function (\ReflectionAttribute $attribute) {
-            return $attribute->getArguments()['event'];
-        }, $attributes);
     }
 }
