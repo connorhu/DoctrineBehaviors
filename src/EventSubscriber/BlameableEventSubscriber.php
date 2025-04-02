@@ -173,11 +173,14 @@ final class BlameableEventSubscriber implements EventSubscriber
             return;
         }
 
+        $userMetadata = $this->entityManager->getClassMetadata($this->blameableUserEntity);
+
         $classMetadataInfo->mapManyToOne([
             'fieldName' => $fieldName,
             'targetEntity' => $this->blameableUserEntity,
             'joinColumns' => [
                 [
+                    'referencedColumnName' => $userMetadata->getColumnName($userMetadata->getSingleIdentifierFieldName()),
                     'onDelete' => 'SET NULL',
                 ],
             ],
