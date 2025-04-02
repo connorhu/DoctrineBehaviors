@@ -16,6 +16,7 @@ use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\UnitOfWork;
 use Knp\DoctrineBehaviors\Contract\Entity\BlameableInterface;
 use Knp\DoctrineBehaviors\Contract\Provider\UserProviderInterface;
+use Knp\DoctrineBehaviors\Exception\InvalidArgumentException;
 
 #[AsDoctrineListener(event: Events::prePersist)]
 #[AsDoctrineListener(event: Events::preUpdate)]
@@ -43,6 +44,9 @@ final class BlameableEventSubscriber implements EventSubscriber
     public function __construct(
         private UserProviderInterface $userProvider,
         private EntityManagerInterface $entityManager,
+        /**
+         * @var class-string<object>|null
+         */
         private ?string $blameableUserEntity = null
     ) {
     }
@@ -172,6 +176,10 @@ final class BlameableEventSubscriber implements EventSubscriber
     {
         if ($classMetadataInfo->hasAssociation($fieldName)) {
             return;
+        }
+
+        if ($this->blameableUserEntity === null) {
+            throw new InvalidArgumentException();
         }
 
         $userMetadata = $this->entityManager->getClassMetadata($this->blameableUserEntity);
