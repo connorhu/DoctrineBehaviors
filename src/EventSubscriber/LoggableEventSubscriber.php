@@ -6,7 +6,6 @@ namespace Knp\DoctrineBehaviors\EventSubscriber;
 
 use Doctrine\Bundle\DoctrineBundle\Attribute\AsDoctrineListener;
 use Doctrine\Common\EventSubscriber;
-use Doctrine\ORM\Event\LifecycleEventArgs;
 use Doctrine\ORM\Event\PostPersistEventArgs;
 use Doctrine\ORM\Event\PostUpdateEventArgs;
 use Doctrine\ORM\Event\PreRemoveEventArgs;
@@ -57,6 +56,15 @@ final class LoggableEventSubscriber implements EventSubscriber
         }
     }
 
+    public function getSubscribedEvents()
+    {
+        $class = new \ReflectionClass(__CLASS__);
+        $attributes = $class->getAttributes(AsDoctrineListener::class);
+        return array_map(function (\ReflectionAttribute $attribute) {
+            return $attribute->getArguments()['event'];
+        }, $attributes);
+    }
+
     /**
      * Logs entity changeset
      */
@@ -80,14 +88,5 @@ final class LoggableEventSubscriber implements EventSubscriber
         }
 
         $this->logger->log(LogLevel::INFO, $message);
-    }
-
-    public function getSubscribedEvents()
-    {
-        $class = new \ReflectionClass(__CLASS__);
-        $attributes = $class->getAttributes(AsDoctrineListener::class);
-        return array_map(function (\ReflectionAttribute $attribute) {
-            return $attribute->getArguments()['event'];
-        }, $attributes);
     }
 }
