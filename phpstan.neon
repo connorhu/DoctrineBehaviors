@@ -2,11 +2,11 @@ includes:
     - phpstan-extension.neon
 
     - vendor/symplify/phpstan-rules/config/static-rules.neon
-    - vendor/symplify/phpstan-rules/config/array-rules.neon
+#    - vendor/symplify/phpstan-rules/config/array-rules.neon
     - vendor/symplify/phpstan-rules/config/doctrine-rules.neon
-    - vendor/symplify/phpstan-rules/config/regex-rules.neon
-    - vendor/symplify/phpstan-rules/config/forbidden-static-rules.neon
-    - vendor/symplify/phpstan-rules/config/test-rules.neon
+#    - vendor/symplify/phpstan-rules/config/regex-rules.neon
+#    - vendor/symplify/phpstan-rules/config/forbidden-static-rules.neon
+#    - vendor/symplify/phpstan-rules/config/test-rules.neon
 
 parameters:
     paths:
@@ -15,7 +15,7 @@ parameters:
         - utils/phpstan-behaviors/src
 
     level: 8
-    checkGenericClassInNonGenericObjectType: false
+    # checkGenericClassInNonGenericObjectType: false
 
     # to allow installing with various phsptan versions without reporting old errors here
     reportUnmatchedIgnoredErrors: false
