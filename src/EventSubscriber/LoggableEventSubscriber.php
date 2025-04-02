@@ -62,9 +62,9 @@ final class LoggableEventSubscriber implements EventSubscriber
      */
     private function logChangeSet(PostPersistEventArgs|PostUpdateEventArgs $eventArgs): void
     {
-        $entityManager = $eventArgs->getEntityManager();
+        $entityManager = $eventArgs->getObjectManager();
         $unitOfWork = $entityManager->getUnitOfWork();
-        $entity = $eventArgs->getEntity();
+        $entity = $eventArgs->getObject();
 
         $entityClass = $entity::class;
         $classMetadata = $entityManager->getClassMetadata($entityClass);
