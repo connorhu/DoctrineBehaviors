@@ -9,6 +9,7 @@ use Doctrine\ORM\Event\LifecycleEventArgs;
 use Doctrine\ORM\Event\LoadClassMetadataEventArgs;
 use Doctrine\ORM\Events;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
+use Doctrine\ORM\Mapping\MappingException;
 use Doctrine\Persistence\ObjectManager;
 use Knp\DoctrineBehaviors\Contract\Entity\TranslatableInterface;
 use Knp\DoctrineBehaviors\Contract\Entity\TranslationInterface;
@@ -51,10 +52,12 @@ final class TranslatableEventSubscriber implements EventSubscriberInterface
         }
 
         if (is_a($classMetadata->reflClass->getName(), TranslatableInterface::class, true)) {
+            /** @var ClassMetadataInfo<TranslatableInterface> $classMetadata */
             $this->mapTranslatable($classMetadata);
         }
 
         if (is_a($classMetadata->reflClass->getName(), TranslationInterface::class, true)) {
+            /** @var ClassMetadataInfo<TranslationInterface> $classMetadata */
             $this->mapTranslation($classMetadata, $loadClassMetadataEventArgs->getObjectManager());
         }
     }
@@ -97,6 +100,11 @@ final class TranslatableEventSubscriber implements EventSubscriberInterface
         return ClassMetadataInfo::FETCH_LAZY;
     }
 
+    /**
+     * @param ClassMetadataInfo<TranslatableInterface> $classMetadataInfo
+     * @return void
+     * @throws \ReflectionException
+     */
     private function mapTranslatable(ClassMetadataInfo $classMetadataInfo): void
     {
         if ($classMetadataInfo->hasAssociation('translations')) {
@@ -116,6 +124,13 @@ final class TranslatableEventSubscriber implements EventSubscriberInterface
         ]);
     }
 
+    /**
+     * @param ClassMetadataInfo<TranslationInterface> $classMetadataInfo
+     * @param ObjectManager $objectManager
+     * @return void
+     * @throws MappingException
+     * @throws \ReflectionException
+     */
     private function mapTranslation(ClassMetadataInfo $classMetadataInfo, ObjectManager $objectManager): void
     {
         if (! $classMetadataInfo->hasAssociation('translatable')) {
@@ -123,7 +138,7 @@ final class TranslatableEventSubscriber implements EventSubscriberInterface
                 ->getMethod('getTranslatableEntityClass')
                 ->invoke(null);
 
-            /** @var ClassMetadataInfo $classMetadata */
+            /** @var ClassMetadataInfo<TranslatableInterface> $classMetadata */
             $classMetadata = $objectManager->getClassMetadata($targetEntity);
 
             $singleIdentifierColumnName = $classMetadata->getSingleIdentifierColumnName();
@@ -177,6 +192,11 @@ final class TranslatableEventSubscriber implements EventSubscriberInterface
         }
     }
 
+    /**
+     * @param ClassMetadataInfo<TranslationInterface> $classMetadataInfo
+     * @param string $name
+     * @return bool
+     */
     private function hasUniqueTranslationConstraint(ClassMetadataInfo $classMetadataInfo, string $name): bool
     {
         return isset($classMetadataInfo->table['uniqueConstraints'][$name]);
