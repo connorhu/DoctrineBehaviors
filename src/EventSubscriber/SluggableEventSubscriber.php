@@ -28,6 +28,7 @@ final class SluggableEventSubscriber implements EventSubscriberInterface
 
     public function loadClassMetadata(LoadClassMetadataEventArgs $loadClassMetadataEventArgs): void
     {
+        /** @var ClassMetadataInfo<SluggableInterface> $classMetadata */
         $classMetadata = $loadClassMetadataEventArgs->getClassMetadata();
         if ($this->shouldSkip($classMetadata)) {
             return;
@@ -58,6 +59,10 @@ final class SluggableEventSubscriber implements EventSubscriberInterface
         return [Events::loadClassMetadata, Events::prePersist, Events::preUpdate];
     }
 
+    /**
+     * @param ClassMetadataInfo<SluggableInterface> $classMetadataInfo
+     * @return bool
+     */
     private function shouldSkip(ClassMetadataInfo $classMetadataInfo): bool
     {
         if (! is_a($classMetadataInfo->getName(), SluggableInterface::class, true)) {
