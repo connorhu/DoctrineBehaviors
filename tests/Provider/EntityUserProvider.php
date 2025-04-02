@@ -40,14 +40,14 @@ final class EntityUserProvider implements UserProviderInterface
         $this->userEntities[$name] = $userEntity;
     }
 
-    public function provideUser()
+    public function provideUser(): UserEntity
     {
         $this->prepareUserEntities();
 
         return $this->userEntity;
     }
 
-    public function provideUserEntity(): ?string
+    public function provideUserEntity(): string
     {
         return UserEntity::class;
     }

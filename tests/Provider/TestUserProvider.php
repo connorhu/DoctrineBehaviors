@@ -22,7 +22,7 @@ final class TestUserProvider implements UserProviderInterface
         return $this->user;
     }
 
-    public function provideUserEntity(): ?string
+    public function provideUserEntity(): string
     {
         return $this->userEntity;
     }
