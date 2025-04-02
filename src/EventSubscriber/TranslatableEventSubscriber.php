@@ -106,7 +106,7 @@ final class TranslatableEventSubscriber implements EventSubscriber
             'fieldName' => 'translations',
             'mappedBy' => 'translatable',
             'indexBy' => self::LOCALE,
-            'cascade' => ['persist', 'merge', 'remove'],
+            'cascade' => ['persist', 'remove'],
             'fetch' => $this->translatableFetchMode,
             'targetEntity' => $classMetadataInfo->getReflectionClass()
                 ->getMethod('getTranslationEntityClass')
@@ -130,7 +130,7 @@ final class TranslatableEventSubscriber implements EventSubscriber
             $classMetadataInfo->mapManyToOne([
                 'fieldName' => 'translatable',
                 'inversedBy' => 'translations',
-                'cascade' => ['persist', 'merge'],
+                'cascade' => ['persist'],
                 'fetch' => $this->translationFetchMode,
                 'joinColumns' => [[
                     'name' => 'translatable_id',
