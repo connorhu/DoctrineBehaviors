@@ -11,6 +11,7 @@ use Doctrine\ORM\Event\PrePersistEventArgs;
 use Doctrine\ORM\Events;
 use Knp\DoctrineBehaviors\Contract\Entity\UuidableInterface;
 
+#[AsDoctrineListener(event: Events::loadClassMetadata)]
 #[AsDoctrineListener(event: Events::prePersist)]
 final class UuidableEventSubscriber implements EventSubscriber
 {
