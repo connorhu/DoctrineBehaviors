@@ -1,7 +1,7 @@
 includes:
     - phpstan-extension.neon
 
-    - vendor/symplify/phpstan-rules/config/static-rules.neon
+#    - vendor/symplify/phpstan-rules/config/static-rules.neon
 #    - vendor/symplify/phpstan-rules/config/array-rules.neon
     - vendor/symplify/phpstan-rules/config/doctrine-rules.neon
 #    - vendor/symplify/phpstan-rules/config/regex-rules.neon
