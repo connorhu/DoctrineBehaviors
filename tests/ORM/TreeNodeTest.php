@@ -10,7 +10,6 @@ use Knp\DoctrineBehaviors\Exception\TreeException;
 use Knp\DoctrineBehaviors\Tests\AbstractBehaviorTestCase;
 use Knp\DoctrineBehaviors\Tests\Fixtures\Entity\TreeNodeEntity;
 use Knp\DoctrineBehaviors\Tests\Fixtures\Repository\TreeNodeRepository;
-use Nette\Utils\Json;
 use PHPUnit\Framework\Attributes\DataProvider;
 
 final class TreeNodeTest extends AbstractBehaviorTestCase
@@ -169,11 +168,21 @@ final class TreeNodeTest extends AbstractBehaviorTestCase
         $this->assertSame($expected, $treeNodeEntity->toArray());
     }
 
+    public static function jsonEncode(mixed $value): string
+    {
+        $json = json_encode($value);
+        if ($error = json_last_error()) {
+            throw new \RuntimeException(json_last_error_msg(), $error);
+        }
+
+        return $json;
+    }
+
     public function testToJson(): void
     {
         $expected = $this->provideToArray();
         $treeNodeEntity = TreeNodeTest::buildTree();
-        $this->assertSame(Json::encode($expected), $treeNodeEntity->toJson());
+        $this->assertSame(self::jsonEncode($expected), $treeNodeEntity->toJson());
     }
 
     public function testToFlatArray(): void
