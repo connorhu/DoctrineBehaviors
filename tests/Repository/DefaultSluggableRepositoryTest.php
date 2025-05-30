@@ -7,6 +7,7 @@ namespace Knp\DoctrineBehaviors\Tests\Repository;
 use Doctrine\ORM\AbstractQuery;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\ClassMetadata;
+use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
 use Knp\DoctrineBehaviors\Contract\Entity\SluggableInterface;
 use Knp\DoctrineBehaviors\Repository\DefaultSluggableRepository;
@@ -94,9 +95,16 @@ final class DefaultSluggableRepositoryTest extends TestCase
                 return $queryBuilder;
             });
 
+        $queryRefl = new \ReflectionClass(Query::class);
+        if (!$queryRefl->isFinal()) {
+            $query = $this->createMock(Query::class); // orm 3
+        } else {
+            $query = $this->createMock(AbstractQuery::class); // orm 2
+        }
+
         $queryBuilder->expects(self::once())
             ->method('getQuery')
-            ->willReturn($query = $this->createMock(AbstractQuery::class));
+            ->willReturn($query);
 
         $query->expects(self::once())
             ->method('getSingleScalarResult')
