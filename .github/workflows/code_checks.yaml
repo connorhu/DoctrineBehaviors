@@ -13,7 +13,7 @@ jobs:
                 actions:
                     -
                         name: 'PHPStan'
-                        run: composer phpstan
+                        run: vendor/bin/phpstan analyse --configuration=.github/workflow/config/phpstan.neon --ansi --error-format symplify --memory-limit 1G
 
                     -
                         name: 'Coding Standard'
@@ -37,6 +37,7 @@ jobs:
                     php-version: 8.1
                     extensions: pdo_sqlite, pdo_mysql, pdo_pgsql
                     coverage: none
+                    tools: phpunit:11.3
 
             -   run: composer install --no-progress
 

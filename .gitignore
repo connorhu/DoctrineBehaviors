@@ -6,4 +6,4 @@ composer.lock
 config/secrets/*
 var/cache/*
 
-phpstan.neon
+/phpstan.neon
