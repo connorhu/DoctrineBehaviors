@@ -4,18 +4,28 @@ declare(strict_types=1);
 
 namespace Knp\DoctrineBehaviors\EventSubscriber;
 
-use Doctrine\Bundle\DoctrineBundle\EventSubscriber\EventSubscriberInterface;
+use Doctrine\Bundle\DoctrineBundle\Attribute\AsDoctrineListener;
+use Doctrine\Common\EventSubscriber;
 use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\ORM\Event\LifecycleEventArgs;
 use Doctrine\ORM\Event\LoadClassMetadataEventArgs;
+use Doctrine\ORM\Event\PrePersistEventArgs;
+use Doctrine\ORM\Event\PreRemoveEventArgs;
+use Doctrine\ORM\Event\PreUpdateEventArgs;
 use Doctrine\ORM\Events;
-use Doctrine\ORM\Mapping\ClassMetadataInfo;
+use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\UnitOfWork;
 use Knp\DoctrineBehaviors\Contract\Entity\BlameableInterface;
 use Knp\DoctrineBehaviors\Contract\Provider\UserProviderInterface;
+use Knp\DoctrineBehaviors\Exception\InvalidArgumentException;
 
-final class BlameableEventSubscriber implements EventSubscriberInterface
+#[AsDoctrineListener(event: Events::prePersist)]
+#[AsDoctrineListener(event: Events::preUpdate)]
+#[AsDoctrineListener(event: Events::preRemove)]
+#[AsDoctrineListener(event: Events::loadClassMetadata)]
+final class BlameableEventSubscriber implements EventSubscriber
 {
+    use SubscribedEventsWithAttributeTrait;
+
     /**
      * @var string
      */
@@ -34,6 +44,9 @@ final class BlameableEventSubscriber implements EventSubscriberInterface
     public function __construct(
         private UserProviderInterface $userProvider,
         private EntityManagerInterface $entityManager,
+        /**
+         * @var class-string<object>|null
+         */
         private ?string $blameableUserEntity = null
     ) {
     }
@@ -59,9 +72,9 @@ final class BlameableEventSubscriber implements EventSubscriberInterface
     /**
      * Stores the current user into createdBy and updatedBy properties
      */
-    public function prePersist(LifecycleEventArgs $lifecycleEventArgs): void
+    public function prePersist(PrePersistEventArgs $eventArgs): void
     {
-        $entity = $lifecycleEventArgs->getEntity();
+        $entity = $eventArgs->getObject();
         if (! $entity instanceof BlameableInterface) {
             return;
         }
@@ -90,9 +103,9 @@ final class BlameableEventSubscriber implements EventSubscriberInterface
     /**
      * Stores the current user into updatedBy property
      */
-    public function preUpdate(LifecycleEventArgs $lifecycleEventArgs): void
+    public function preUpdate(PreUpdateEventArgs $eventArgs): void
     {
-        $entity = $lifecycleEventArgs->getEntity();
+        $entity = $eventArgs->getObject();
         if (! $entity instanceof BlameableInterface) {
             return;
         }
@@ -112,9 +125,9 @@ final class BlameableEventSubscriber implements EventSubscriberInterface
     /**
      * Stores the current user into deletedBy property
      */
-    public function preRemove(LifecycleEventArgs $lifecycleEventArgs): void
+    public function preRemove(PreRemoveEventArgs $eventArgs): void
     {
-        $entity = $lifecycleEventArgs->getEntity();
+        $entity = $eventArgs->getObject();
         if (! $entity instanceof BlameableInterface) {
             return;
         }
@@ -131,15 +144,7 @@ final class BlameableEventSubscriber implements EventSubscriberInterface
             ->propertyChanged($entity, self::DELETED_BY, $oldDeletedBy, $user);
     }
 
-    /**
-     * @return string[]
-     */
-    public function getSubscribedEvents(): array
-    {
-        return [Events::prePersist, Events::preUpdate, Events::preRemove, Events::loadClassMetadata];
-    }
-
-    private function mapEntity(ClassMetadataInfo $classMetadataInfo): void
+    private function mapEntity(ClassMetadata $classMetadataInfo): void
     {
         if ($this->blameableUserEntity !== null && class_exists($this->blameableUserEntity)) {
             $this->mapManyToOneUser($classMetadataInfo);
@@ -153,38 +158,47 @@ final class BlameableEventSubscriber implements EventSubscriberInterface
         return $this->entityManager->getUnitOfWork();
     }
 
-    private function mapManyToOneUser(ClassMetadataInfo $classMetadataInfo): void
+    private function mapManyToOneUser(ClassMetadata $classMetadataInfo): void
     {
         $this->mapManyToOneWithTargetEntity($classMetadataInfo, self::CREATED_BY);
         $this->mapManyToOneWithTargetEntity($classMetadataInfo, self::UPDATED_BY);
         $this->mapManyToOneWithTargetEntity($classMetadataInfo, self::DELETED_BY);
     }
 
-    private function mapStringUser(ClassMetadataInfo $classMetadataInfo): void
+    private function mapStringUser(ClassMetadata $classMetadataInfo): void
     {
         $this->mapStringNullableField($classMetadataInfo, self::CREATED_BY);
         $this->mapStringNullableField($classMetadataInfo, self::UPDATED_BY);
         $this->mapStringNullableField($classMetadataInfo, self::DELETED_BY);
     }
 
-    private function mapManyToOneWithTargetEntity(ClassMetadataInfo $classMetadataInfo, string $fieldName): void
+    private function mapManyToOneWithTargetEntity(ClassMetadata $classMetadataInfo, string $fieldName): void
     {
         if ($classMetadataInfo->hasAssociation($fieldName)) {
             return;
         }
+
+        if ($this->blameableUserEntity === null) {
+            throw new InvalidArgumentException();
+        }
+
+        $userMetadata = $this->entityManager->getClassMetadata($this->blameableUserEntity);
 
         $classMetadataInfo->mapManyToOne([
             'fieldName' => $fieldName,
             'targetEntity' => $this->blameableUserEntity,
             'joinColumns' => [
                 [
+                    'referencedColumnName' => $userMetadata->getColumnName(
+                        $userMetadata->getSingleIdentifierFieldName()
+                    ),
                     'onDelete' => 'SET NULL',
                 ],
             ],
         ]);
     }
 
-    private function mapStringNullableField(ClassMetadataInfo $classMetadataInfo, string $fieldName): void
+    private function mapStringNullableField(ClassMetadata $classMetadataInfo, string $fieldName): void
     {
         if ($classMetadataInfo->hasField($fieldName)) {
             return;
