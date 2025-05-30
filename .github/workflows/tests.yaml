@@ -23,7 +23,8 @@ jobs:
                     php-version: ${{ matrix.php }}
                     extensions: pdo_sqlite, pdo_mysql, pdo_pgsql
                     coverage: none
+                    tools: phpunit:11.3
 
             -   run: composer install --no-progress
 
-            -   run: vendor/bin/phpunit
+            -   run: phpunit
