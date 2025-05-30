@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace Knp\DoctrineBehaviors\Tests;
 
-use \RuntimeException;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Logging\DebugStack;
 use Doctrine\DBAL\Platforms\PostgreSQL94Platform;
 use Doctrine\ORM\EntityManagerInterface;
 use Knp\DoctrineBehaviors\Tests\HttpKernel\DoctrineBehaviorsKernel;
 use PHPUnit\Framework\TestCase;
+use RuntimeException;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 abstract class AbstractBehaviorTestCase extends TestCase
