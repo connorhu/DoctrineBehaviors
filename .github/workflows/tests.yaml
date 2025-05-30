@@ -10,7 +10,6 @@ jobs:
                 php:
                     - 8.2
                     - 8.3
-                    - 8.4
 
         name: Test ${{ matrix.php }}
         runs-on: ubuntu-latest
