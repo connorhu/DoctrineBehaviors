@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Knp\DoctrineBehaviors\Tests;
 
+use \RuntimeException;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Logging\DebugStack;
 use Doctrine\DBAL\Platforms\PostgreSQL94Platform;
@@ -104,7 +105,7 @@ abstract class AbstractBehaviorTestCase extends TestCase
 
         if ($json === false) {
             $error = json_last_error();
-            throw new \RuntimeException(json_last_error_msg(), $error);
+            throw new RuntimeException(json_last_error_msg(), $error);
         }
 
         return $json;
