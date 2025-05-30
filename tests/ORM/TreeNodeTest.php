@@ -168,16 +168,6 @@ final class TreeNodeTest extends AbstractBehaviorTestCase
         $this->assertSame($expected, $treeNodeEntity->toArray());
     }
 
-    public static function jsonEncode(mixed $value): string
-    {
-        $json = json_encode($value);
-        if ($error = json_last_error()) {
-            throw new \RuntimeException(json_last_error_msg(), $error);
-        }
-
-        return $json;
-    }
-
     public function testToJson(): void
     {
         $expected = $this->provideToArray();

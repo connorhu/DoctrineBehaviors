@@ -97,4 +97,14 @@ abstract class AbstractBehaviorTestCase extends TestCase
             restore_exception_handler();
         }
     }
+
+    protected static function jsonEncode(mixed $value): string
+    {
+        $json = json_encode($value);
+        if ($error = json_last_error()) {
+            throw new \RuntimeException(json_last_error_msg(), $error);
+        }
+
+        return $json;
+    }
 }
