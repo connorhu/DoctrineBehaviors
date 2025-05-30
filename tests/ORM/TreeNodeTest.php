@@ -11,6 +11,7 @@ use Knp\DoctrineBehaviors\Tests\AbstractBehaviorTestCase;
 use Knp\DoctrineBehaviors\Tests\Fixtures\Entity\TreeNodeEntity;
 use Knp\DoctrineBehaviors\Tests\Fixtures\Repository\TreeNodeRepository;
 use Nette\Utils\Json;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 final class TreeNodeTest extends AbstractBehaviorTestCase
 {
@@ -115,9 +116,7 @@ final class TreeNodeTest extends AbstractBehaviorTestCase
         $treeNodeEntity->setMaterializedPath('/0/1/2/3/4/5/6/');
     }
 
-    /**
-     * @dataProvider provideIsChildNodeOf()
-     */
+    #[DataProvider('provideIsChildNodeOf')]
     public function testTestisChildNodeOf(TreeNodeInterface $child, TreeNodeInterface $parent, bool $expected): void
     {
         $this->assertSame($expected, $child->isChildNodeOf($parent));
