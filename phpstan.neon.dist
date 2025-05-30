@@ -127,3 +127,15 @@ parameters:
         -
             message: '#sprintf\(\) call mask types does not match provided arguments types#'
             path: src/Model/Loggable/LoggableTrait.php
+
+        -
+            message: '#Class has a static method must so must contains "Static" in its name#'
+
+        -
+            message: '#Attribute must have all names explicitly defined#'
+
+        -
+            message: '#Property Knp\\DoctrineBehaviors\\Tests\\Fixtures\\Entity\\TreeNodeEntity\:\:\$parentNodePath is never read, only written#'
+
+        -
+            message: '#Use custom exceptions instead of native "RuntimeException"#'

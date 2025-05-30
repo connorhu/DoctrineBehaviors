@@ -35,8 +35,6 @@ abstract class AbstractBehaviorTestCase extends TestCase
 
     protected function tearDown(): void
     {
-        parent::tearDown();
-
         $this->restoreExceptionHandler();
     }
 
