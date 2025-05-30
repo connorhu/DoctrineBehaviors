@@ -49,9 +49,10 @@ final class DefaultSluggableRepositoryTest extends TestCase
                 'id.id' => '123',
             ]);
 
+        $queryBuilder = $this->createMock(QueryBuilder::class);
         $this->entityManager->expects(self::once())
             ->method('createQueryBuilder')
-            ->willReturn($queryBuilder = $this->createMock(QueryBuilder::class));
+            ->willReturn($queryBuilder);
 
         $queryBuilder->expects(self::once())
             ->method('select')
@@ -63,15 +64,35 @@ final class DefaultSluggableRepositoryTest extends TestCase
             ->with($entityClass, 'e')
             ->willReturnSelf();
 
-        $queryBuilder->expects(self::exactly(2))
+        $expected = [
+            1 => 'e.slug = :slug',
+            2 => 'e.id.id != :id_id',
+        ];
+        $matcher = $this->exactly(count($expected));
+        $queryBuilder
+            ->expects($matcher)
             ->method('andWhere')
-            ->withConsecutive(['e.slug = :slug'], ['e.id.id != :id_id'])
-            ->willReturnSelf();
+            ->willReturnCallback(function (string $condition) use ($matcher, $expected, $queryBuilder) {
+                $callNumber = $matcher->numberOfInvocations();
+                $this->assertSame($expected[$callNumber], $condition);
 
-        $queryBuilder->expects(self::exactly(2))
+                return $queryBuilder;
+            });
+
+        $expected = [
+            1 => ['slug', $uniqueSlug],
+            2 => ['id_id', '123'],
+        ];
+        $matcher = self::exactly(2);
+        $queryBuilder->expects($matcher)
             ->method('setParameter')
-            ->withConsecutive(['slug', $uniqueSlug], ['id_id', '123'])
-            ->willReturnSelf();
+            ->willReturnCallback(function ($name, $value) use ($matcher, $expected, $queryBuilder) {
+                $callNumber = $matcher->numberOfInvocations();
+                $this->assertSame($name, $expected[$callNumber][0]);
+                $this->assertSame($value, $expected[$callNumber][1]);
+
+                return $queryBuilder;
+            });
 
         $queryBuilder->expects(self::once())
             ->method('getQuery')

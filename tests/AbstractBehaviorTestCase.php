@@ -10,6 +10,7 @@ use Doctrine\DBAL\Platforms\PostgreSQL94Platform;
 use Doctrine\ORM\EntityManagerInterface;
 use Knp\DoctrineBehaviors\Tests\HttpKernel\DoctrineBehaviorsKernel;
 use PHPUnit\Framework\TestCase;
+use RuntimeException;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 abstract class AbstractBehaviorTestCase extends TestCase
@@ -30,6 +31,11 @@ abstract class AbstractBehaviorTestCase extends TestCase
 
         $this->entityManager = $this->getService('doctrine.orm.entity_manager');
         $this->loadDatabaseFixtures();
+    }
+
+    protected function tearDown(): void
+    {
+        $this->restoreExceptionHandler();
     }
 
     protected function loadDatabaseFixtures(): void
@@ -74,5 +80,32 @@ abstract class AbstractBehaviorTestCase extends TestCase
     protected function getService(string $type): object
     {
         return $this->container->get($type);
+    }
+
+    protected function restoreExceptionHandler(): void
+    {
+        while (true) {
+            $previousHandler = set_exception_handler(static fn () => null);
+
+            restore_exception_handler();
+
+            if ($previousHandler === null) {
+                break;
+            }
+
+            restore_exception_handler();
+        }
+    }
+
+    protected static function jsonEncode(mixed $value): string
+    {
+        $json = json_encode($value);
+
+        if ($json === false) {
+            $error = json_last_error();
+            throw new RuntimeException(json_last_error_msg(), $error);
+        }
+
+        return $json;
     }
 }
