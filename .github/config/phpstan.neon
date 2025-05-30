@@ -1,5 +1,5 @@
 includes:
-    - ../phpstan.neon.dist
+    - ../../phpstan.neon.dist
 
 parameters:
     bootstrapFiles:

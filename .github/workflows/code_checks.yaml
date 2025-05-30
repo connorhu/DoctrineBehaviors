@@ -13,7 +13,7 @@ jobs:
                 actions:
                     -
                         name: 'PHPStan'
-                        run: vendor/bin/phpstan analyse --configuration=.github/workflow/config/phpstan.neon --ansi --error-format symplify --memory-limit 1G
+                        run: vendor/bin/phpstan analyse --configuration=.github/config/phpstan.neon --ansi --error-format symplify --memory-limit 1G
 
                     -
                         name: 'Coding Standard'
