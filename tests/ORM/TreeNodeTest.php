@@ -70,7 +70,7 @@ final class TreeNodeTest extends AbstractBehaviorTestCase
 
     public function testIsRoot(): void
     {
-        $treeNodeEntity = TreeNodeTest::buildTree();
+        $treeNodeEntity = self::buildTree();
 
         $this->assertTrue($treeNodeEntity->getRootNode()->isRootNode());
         $this->assertTrue($treeNodeEntity->isRootNode());
@@ -78,7 +78,7 @@ final class TreeNodeTest extends AbstractBehaviorTestCase
 
     public function testIsLeaf(): void
     {
-        $treeNodeEntity = TreeNodeTest::buildTree();
+        $treeNodeEntity = self::buildTree();
 
         $this->assertTrue($treeNodeEntity[0][0][0]->isLeafNode());
         $this->assertTrue($treeNodeEntity[1]->isLeafNode());
@@ -86,7 +86,7 @@ final class TreeNodeTest extends AbstractBehaviorTestCase
 
     public function testGetRoot(): void
     {
-        $treeNodeEntity = TreeNodeTest::buildTree();
+        $treeNodeEntity = self::buildTree();
 
         $this->assertSame($treeNodeEntity, $treeNodeEntity->getRootNode());
         $this->assertNull($treeNodeEntity->getRootNode()->getParentNode());
@@ -123,7 +123,7 @@ final class TreeNodeTest extends AbstractBehaviorTestCase
 
     public static function provideIsChildNodeOf(): Iterator
     {
-        $treeNodeEntity = TreeNodeTest::buildTree();
+        $treeNodeEntity = self::buildTree();
 
         yield [$treeNodeEntity[0][0], $treeNodeEntity[0], true];
         yield [$treeNodeEntity[0][0][0], $treeNodeEntity[0][0], true];
@@ -163,7 +163,7 @@ final class TreeNodeTest extends AbstractBehaviorTestCase
     public function testToArray(): void
     {
         $expected = $this->provideToArray();
-        $treeNodeEntity = TreeNodeTest::buildTree();
+        $treeNodeEntity = self::buildTree();
 
         $this->assertSame($expected, $treeNodeEntity->toArray());
     }
@@ -171,7 +171,7 @@ final class TreeNodeTest extends AbstractBehaviorTestCase
     public function testToJson(): void
     {
         $expected = $this->provideToArray();
-        $treeNodeEntity = TreeNodeTest::buildTree();
+        $treeNodeEntity = self::buildTree();
         $this->assertSame(self::jsonEncode($expected), $treeNodeEntity->toJson());
     }
 
@@ -185,12 +185,12 @@ final class TreeNodeTest extends AbstractBehaviorTestCase
             3 => '----',
         ];
 
-        $this->assertSame($expected, TreeNodeTest::buildTree()->toFlatArray());
+        $this->assertSame($expected, self::buildTree()->toFlatArray());
     }
 
     public function testArrayAccess(): void
     {
-        $tree = TreeNodeTest::buildTree();
+        $tree = self::buildTree();
 
         $treeNodeEntity45 = new TreeNodeEntity();
         $treeNodeEntity45->setId(45);
@@ -262,7 +262,7 @@ final class TreeNodeTest extends AbstractBehaviorTestCase
 
     public function testChildrenCount(): void
     {
-        $treeNodeEntity = TreeNodeTest::buildTree();
+        $treeNodeEntity = self::buildTree();
 
         $this->assertCount(2, $treeNodeEntity->getChildNodes());
         $this->assertCount(1, $treeNodeEntity->getChildNodes()->get(0)->getChildNodes());
@@ -270,7 +270,7 @@ final class TreeNodeTest extends AbstractBehaviorTestCase
 
     public function testGetPath(): void
     {
-        $treeNodeEntity = TreeNodeTest::buildTree();
+        $treeNodeEntity = self::buildTree();
 
         $this->assertSame('/1', $treeNodeEntity->getRealMaterializedPath());
         $this->assertSame('/1/2', $treeNodeEntity->getChildNodes()->get(0)->getRealMaterializedPath());
@@ -319,7 +319,7 @@ final class TreeNodeTest extends AbstractBehaviorTestCase
 
     public function testMoveChildren(): void
     {
-        $treeNodeEntity = TreeNodeTest::buildTree();
+        $treeNodeEntity = self::buildTree();
 
         $childChildItem = $treeNodeEntity->getChildNodes()
             ->get(0)

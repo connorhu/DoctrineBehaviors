@@ -32,6 +32,13 @@ abstract class AbstractBehaviorTestCase extends TestCase
         $this->loadDatabaseFixtures();
     }
 
+    protected function tearDown(): void
+    {
+        parent::tearDown();
+
+        $this->restoreExceptionHandler();
+    }
+
     protected function loadDatabaseFixtures(): void
     {
         /** @var DatabaseLoader $databaseLoader */
@@ -76,17 +83,10 @@ abstract class AbstractBehaviorTestCase extends TestCase
         return $this->container->get($type);
     }
 
-    protected function tearDown(): void
-    {
-        parent::tearDown();
-
-        $this->restoreExceptionHandler();
-    }
-
     protected function restoreExceptionHandler(): void
     {
         while (true) {
-            $previousHandler = set_exception_handler(static fn() => null);
+            $previousHandler = set_exception_handler(static fn () => null);
 
             restore_exception_handler();
 
